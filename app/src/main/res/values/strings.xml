@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App 名称 -->
+    <string name="app_name">凯机投屏</string>
+
+    <!-- 待机界面 -->
+    <string name="tv_standby_title">凯机投屏！启动！</string>
+
+    <!-- 状态 -->
+    <string name="service_running">投屏服务运行中</string>
+    <string name="service_stopped">投屏服务已停止</string>
+    <string name="starting_service">正在启动服务...</string>
+    <string name="service_started">服务已启动</string>
+    <string name="service_error">服务启动失败</string>
+
+    <!-- 设备名称 -->
+    <string name="device_name">凯机投屏</string>
+
+    <!-- 通知 -->
+    <string name="foreground_service_channel">投屏服务</string>
+    <string name="foreground_service_notification">凯机投屏服务运行中</string>
+
+    <!-- 遥控器 -->
+    <string name="play">播放</string>
+    <string name="pause">暂停</string>
+    <string name="stop">停止</string>
+    <string name="volume_up">音量+</string>
+    <string name="volume_down">音量-</string>
+    <string name="exit">退出</string>
+</resources>
