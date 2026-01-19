@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#FF00BCD4</color>
+    <color name="background">#FF121212</color>
+    <color name="black">#FF000000</color>
+    <color name="on_primary">#FFFFFFFF</color>
+    <color name="on_surface">#FFFFFFFF</color>
+    <color name="primary">#FF1976D2</color>
+    <color name="primary_dark">#FF1565C0</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="surface">#FF1E1E1E</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="app_name">凯机投屏</string>
+    <string name="device_name">凯机投屏</string>
+    <string name="exit">退出</string>
+    <string name="foreground_service_channel">投屏服务</string>
+    <string name="foreground_service_notification">凯机投屏服务运行中</string>
+    <string name="pause">暂停</string>
+    <string name="play">播放</string>
+    <string name="service_error">服务启动失败</string>
+    <string name="service_running">投屏服务运行中</string>
+    <string name="service_started">服务已启动</string>
+    <string name="service_stopped">投屏服务已停止</string>
+    <string name="starting_service">正在启动服务...</string>
+    <string name="stop">停止</string>
+    <string name="tv_standby_title">凯机投屏！启动！</string>
+    <string name="volume_down">音量-</string>
+    <string name="volume_up">音量+</string>
+    <style name="Theme.CasterTVService" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
+    </style>
+</resources>

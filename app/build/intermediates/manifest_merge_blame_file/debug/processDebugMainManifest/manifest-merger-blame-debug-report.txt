@@ -1,0 +1,230 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.caster.tv"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="23"
+9        android:targetSdkVersion="34" />
+10
+11    <!-- Network permissions for DLNA/UPnP -->
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:6:5-67
+12-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:6:22-64
+13    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+13-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:7:5-76
+13-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:7:22-73
+14    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+14-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:8:5-86
+14-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:8:22-83
+15    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+15-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:9:5-79
+15-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:9:22-76
+16
+17    <!-- Foreground service -->
+18    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+18-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:12:5-77
+18-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:12:22-74
+19    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+19-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:13:5-92
+19-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:13:22-89
+20
+21    <!-- Boot completed for auto-start -->
+22    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+22-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:16:5-81
+22-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:16:22-78
+23
+24    <!-- Media session for remote control -->
+25    <uses-permission android:name="android.permission.WAKE_LOCK" />
+25-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:19:5-68
+25-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:19:22-65
+26
+27    <!-- Storage for file casting -->
+28    <uses-permission
+28-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:22:5-23:38
+29        android:name="android.permission.READ_EXTERNAL_STORAGE"
+29-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:22:22-77
+30        android:maxSdkVersion="32" />
+30-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:23:9-35
+31
+32    <!-- WiFi Display / Miracast -->
+33    <uses-feature
+33-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:26:5-90
+34        android:name="android.hardware.wifi.direct"
+34-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:26:19-62
+35        android:required="false" />
+35-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:26:63-87
+36
+37    <permission
+37-->[androidx.core:core:1.12.0] C:\Users\kaiji\.gradle\caches\transforms-4\718b5795429cf36e583af2723762b198\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
+38        android:name="com.caster.tv.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+38-->[androidx.core:core:1.12.0] C:\Users\kaiji\.gradle\caches\transforms-4\718b5795429cf36e583af2723762b198\transformed\core-1.12.0\AndroidManifest.xml:23:9-81
+39        android:protectionLevel="signature" />
+39-->[androidx.core:core:1.12.0] C:\Users\kaiji\.gradle\caches\transforms-4\718b5795429cf36e583af2723762b198\transformed\core-1.12.0\AndroidManifest.xml:24:9-44
+40
+41    <uses-permission android:name="com.caster.tv.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+41-->[androidx.core:core:1.12.0] C:\Users\kaiji\.gradle\caches\transforms-4\718b5795429cf36e583af2723762b198\transformed\core-1.12.0\AndroidManifest.xml:26:5-97
+41-->[androidx.core:core:1.12.0] C:\Users\kaiji\.gradle\caches\transforms-4\718b5795429cf36e583af2723762b198\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
+42
+43    <application
+43-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:28:5-78:19
+44        android:name="com.caster.tv.CasterApplication"
+44-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:29:9-42
+45        android:allowBackup="true"
+45-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:30:9-35
+46        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+46-->[androidx.core:core:1.12.0] C:\Users\kaiji\.gradle\caches\transforms-4\718b5795429cf36e583af2723762b198\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
+47        android:debuggable="true"
+48        android:extractNativeLibs="false"
+49        android:icon="@mipmap/ic_launcher"
+49-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:31:9-43
+50        android:label="@string/app_name"
+50-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:32:9-41
+51        android:roundIcon="@mipmap/ic_launcher_round"
+51-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:33:9-54
+52        android:supportsRtl="true"
+52-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:34:9-35
+53        android:theme="@style/Theme.CasterTVService"
+53-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:35:9-53
+54        android:usesCleartextTraffic="true" >
+54-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:36:9-44
+55
+56        <!-- Main Activity -->
+57        <activity
+57-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:40:9-48:20
+58            android:name="com.caster.tv.ui.MainActivity"
+58-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:41:13-44
+59            android:exported="true"
+59-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:42:13-36
+60            android:theme="@style/Theme.CasterTVService" >
+60-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:43:13-57
+61            <intent-filter>
+61-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:44:13-47:29
+62                <action android:name="android.intent.action.MAIN" />
+62-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:45:17-69
+62-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:45:25-66
+63
+64                <category android:name="android.intent.category.LAUNCHER" />
+64-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:46:17-77
+64-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:46:27-74
+65            </intent-filter>
+66        </activity>
+67
+68        <!-- Main Cast Service (coordinates all services) -->
+69        <service
+69-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:51:9-58:19
+70            android:name="com.caster.tv.service.CastCoordinatorService"
+70-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:52:13-59
+71            android:exported="false"
+71-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:53:13-37
+72            android:foregroundServiceType="mediaPlayback" >
+72-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:54:13-58
+73            <intent-filter>
+73-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:55:13-57:29
+74                <action android:name="androidx.media3.session.MediaSessionService" />
+74-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:56:17-85
+74-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:56:25-83
+75            </intent-filter>
+76        </service>
+77
+78        <!-- Android UPnP Service (Cling stack from TVRemoteIME) -->
+79        <service
+79-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:61:9-63:40
+80            android:name="org.fourthline.cling.android.AndroidUpnpServiceImpl"
+80-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:62:13-79
+81            android:exported="false" />
+81-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:63:13-37
+82
+83        <!-- Boot Receiver for auto-start -->
+84        <receiver
+84-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:66:9-76:20
+85            android:name="com.caster.tv.receiver.BootReceiver"
+85-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:67:13-50
+86            android:enabled="true"
+86-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:69:13-35
+87            android:exported="true" >
+87-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:68:13-36
+88            <intent-filter>
+88-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:70:13-75:29
+89                <action android:name="android.intent.action.BOOT_COMPLETED" />
+89-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:71:17-79
+89-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:71:25-76
+90                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+90-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:72:17-82
+90-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:72:25-79
+91                <!-- For devices like Sharp TV -->
+92                <action android:name="android.intent.action.REBOOT" />
+92-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:74:17-71
+92-->C:\Users\kaiji\vibecodingKJ\project test\CasterTVService\app\src\main\AndroidManifest.xml:74:25-68
+93            </intent-filter>
+94        </receiver>
+95
+96        <provider
+96-->[androidx.emoji2:emoji2:1.2.0] C:\Users\kaiji\.gradle\caches\transforms-4\947855cacaff24bdd91b3f4424dec61a\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+97            android:name="androidx.startup.InitializationProvider"
+97-->[androidx.emoji2:emoji2:1.2.0] C:\Users\kaiji\.gradle\caches\transforms-4\947855cacaff24bdd91b3f4424dec61a\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
+98            android:authorities="com.caster.tv.androidx-startup"
+98-->[androidx.emoji2:emoji2:1.2.0] C:\Users\kaiji\.gradle\caches\transforms-4\947855cacaff24bdd91b3f4424dec61a\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
+99            android:exported="false" >
+99-->[androidx.emoji2:emoji2:1.2.0] C:\Users\kaiji\.gradle\caches\transforms-4\947855cacaff24bdd91b3f4424dec61a\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
+100            <meta-data
+100-->[androidx.emoji2:emoji2:1.2.0] C:\Users\kaiji\.gradle\caches\transforms-4\947855cacaff24bdd91b3f4424dec61a\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+101                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+101-->[androidx.emoji2:emoji2:1.2.0] C:\Users\kaiji\.gradle\caches\transforms-4\947855cacaff24bdd91b3f4424dec61a\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
+102                android:value="androidx.startup" />
+102-->[androidx.emoji2:emoji2:1.2.0] C:\Users\kaiji\.gradle\caches\transforms-4\947855cacaff24bdd91b3f4424dec61a\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
+103            <meta-data
+103-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\kaiji\.gradle\caches\transforms-4\ec61bec3c77f817b75e70a5eeba3f6ea\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+104                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+104-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\kaiji\.gradle\caches\transforms-4\ec61bec3c77f817b75e70a5eeba3f6ea\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+105                android:value="androidx.startup" />
+105-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\kaiji\.gradle\caches\transforms-4\ec61bec3c77f817b75e70a5eeba3f6ea\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+106            <meta-data
+106-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+107                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+107-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+108                android:value="androidx.startup" />
+108-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+109        </provider>
+110
+111        <receiver
+111-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+112            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+112-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+113            android:directBootAware="false"
+113-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+114            android:enabled="true"
+114-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+115            android:exported="true"
+115-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+116            android:permission="android.permission.DUMP" >
+116-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+117            <intent-filter>
+117-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+118                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+118-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+118-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+119            </intent-filter>
+120            <intent-filter>
+120-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+121                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+121-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+121-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+122            </intent-filter>
+123            <intent-filter>
+123-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+124                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+124-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+124-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+125            </intent-filter>
+126            <intent-filter>
+126-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+127                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+127-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+127-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\kaiji\.gradle\caches\transforms-4\458f0d88c1a66d0cb8e722c0ca722979\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+128            </intent-filter>
+129        </receiver>
+130    </application>
+131
+132</manifest>

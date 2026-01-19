@@ -5,9 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.view.KeyEvent
 import android.view.View
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
@@ -26,6 +30,10 @@ class MainActivity : AppCompatActivity() {
     // UI 元素
     private lateinit var playerView: PlayerView
     private lateinit var standbyUi: View
+    private lateinit var seekControlUi: View
+    private lateinit var seekBar: SeekBar
+    private lateinit var currentTime: TextView
+    private lateinit var totalTime: TextView
 
     // 服务绑定
     private var coordinatorService: CastCoordinatorService? = null
@@ -34,6 +42,11 @@ class MainActivity : AppCompatActivity() {
     // 状态
     private var isPlaying = false
     private var hasMediaContent = false
+
+    // UI自动隐藏
+    private val uiHandler = Handler(Looper.getMainLooper())
+    private var seekHideRunnable: Runnable? = null
+    private val UI_HIDE_DELAY = 3000L
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -62,6 +75,12 @@ class MainActivity : AppCompatActivity() {
     private fun initViews() {
         playerView = findViewById(R.id.playerView)
         standbyUi = findViewById(R.id.standbyUi)
+        
+        // 进度条UI
+        seekControlUi = findViewById(R.id.seekControlUi)
+        seekBar = findViewById(R.id.seekBar)
+        currentTime = findViewById(R.id.currentTime)
+        totalTime = findViewById(R.id.totalTime)
         
         // 确保待机界面可见
         Timber.d("Standby UI visibility: ${standbyUi.visibility}")
@@ -98,7 +117,6 @@ class MainActivity : AppCompatActivity() {
                         }
                         Player.STATE_ENDED -> {
                             Timber.d("STATE_ENDED, stopping playback")
-                            // 视频播放完毕，停止并返回待机
                             stopPlaybackAndReturnToStandby()
                         }
                         Player.STATE_IDLE -> {
@@ -174,36 +192,35 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             KeyEvent.KEYCODE_MEDIA_STOP -> {
-                // 停止播放，返回待机
                 stopPlaybackAndReturnToStandby()
                 return true
             }
 
             // 前进/后退 (±10秒)
             KeyEvent.KEYCODE_MEDIA_REWIND -> {
-                seekRelative(-10000)  // 后退10秒
+                seekRelative(-10000)
                 return true
             }
             KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
-                seekRelative(10000)  // 前进10秒
+                seekRelative(10000)
                 return true
             }
 
             // 方向键控制
             KeyEvent.KEYCODE_DPAD_LEFT -> {
-                seekRelative(-10000)  // 后退10秒
+                seekRelative(-10000)
                 return true
             }
             KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                seekRelative(10000)  // 前进10秒
+                seekRelative(10000)
                 return true
             }
             KeyEvent.KEYCODE_DPAD_UP -> {
-                adjustVolume(1)  // 音量+
+                adjustVolume(1)
                 return true
             }
             KeyEvent.KEYCODE_DPAD_DOWN -> {
-                adjustVolume(-1)  // 音量-
+                adjustVolume(-1)
                 return true
             }
 
@@ -217,10 +234,8 @@ class MainActivity : AppCompatActivity() {
             // 返回键 = 停止播放 或 最小化到后台
             KeyEvent.KEYCODE_BACK, KeyEvent.KEYCODE_ESCAPE -> {
                 if (isPlaying || hasMediaContent) {
-                    // 有播放内容时，返回键停止播放
                     stopPlaybackAndReturnToStandby()
                 } else {
-                    // 无播放内容时，返回键最小化到后台（服务继续运行）
                     Timber.d("Minimizing app to background, service keeps running")
                     moveTaskToBack(true)
                 }
@@ -229,7 +244,7 @@ class MainActivity : AppCompatActivity() {
 
             // 静音键
             KeyEvent.KEYCODE_MUTE -> {
-                adjustVolume(-100)  // 静音
+                adjustVolume(-100)
                 return true
             }
 
@@ -264,11 +279,12 @@ class MainActivity : AppCompatActivity() {
                 val currentVolume = audioManager.getStreamVolume(android.media.AudioManager.STREAM_MUSIC)
                 val maxVolume = audioManager.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
                 val newVolume = if (delta == -100) {
-                    0  // 静音
+                    0
                 } else {
                     (currentVolume + delta * maxVolume / 20).coerceIn(0, maxVolume)
                 }
-                audioManager.setStreamVolume(android.media.AudioManager.STREAM_MUSIC, newVolume, 0)
+                // FLAG_SHOW_UI 显示系统音量UI
+                audioManager.setStreamVolume(android.media.AudioManager.STREAM_MUSIC, newVolume, android.media.AudioManager.FLAG_SHOW_UI)
                 Timber.d("Volume: $newVolume/$maxVolume")
             } catch (e: Exception) {
                 Timber.e(e, "Failed to adjust volume")
@@ -281,13 +297,45 @@ class MainActivity : AppCompatActivity() {
             if (player.duration > 0) {
                 val newPosition = (player.currentPosition + deltaMs).coerceIn(0, player.duration)
                 player.seekTo(newPosition)
+                showSeekUI(player.currentPosition, player.duration)
                 Timber.d("Seek to: $newPosition/${player.duration}")
             }
         }
     }
 
+    /**
+     * 显示进度条控制UI
+     */
+    private fun showSeekUI(position: Long, duration: Long) {
+        seekHideRunnable?.let { uiHandler.removeCallbacks(it) }
+        
+        currentTime.text = formatTime(position)
+        totalTime.text = formatTime(duration)
+        
+        val progress = (position * 100 / duration).toInt()
+        seekBar.progress = progress
+        
+        seekControlUi.visibility = View.VISIBLE
+        
+        seekHideRunnable = Runnable {
+            seekControlUi.visibility = View.GONE
+        }
+        uiHandler.postDelayed(seekHideRunnable!!, UI_HIDE_DELAY)
+    }
+
+    /**
+     * 格式化时间为 mm:ss
+     */
+    private fun formatTime(ms: Long): String {
+        val totalSeconds = ms / 1000
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+        return String.format("%02d:%02d", minutes, seconds)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        seekHideRunnable?.let { uiHandler.removeCallbacks(it) }
         if (isBound) {
             unbindService(serviceConnection)
             isBound = false

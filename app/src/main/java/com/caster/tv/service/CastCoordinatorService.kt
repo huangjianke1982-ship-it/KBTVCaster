@@ -1,8 +1,10 @@
 package com.caster.tv.service
 
+import android.app.ActivityManager
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Binder
@@ -287,6 +289,21 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
                 exoPlayer?.prepare()
                 exoPlayer?.play()
                 Timber.d("ExoPlayer started playback: $uri")
+
+                // 投屏时自动将Activity带到前台
+                val activityManager = this@CastCoordinatorService.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                val isForeground = activityManager.runningAppProcesses
+                    .find { proc -> proc.pid == android.os.Process.myPid() }?.importance
+                    ?.equals(ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND)
+                    ?: false
+
+                if (isForeground == false) {
+                    val intent = Intent(this@CastCoordinatorService, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    startActivity(intent)
+                }
+
             } catch (e: Exception) {
                 Timber.e(e, "Failed to play media from URI")
             }
