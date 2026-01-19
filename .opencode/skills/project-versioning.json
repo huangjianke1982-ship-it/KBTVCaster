@@ -1,0 +1,81 @@
+{
+  "skill": {
+    "name": "project-versioning",
+    "description": "Records project versions with proper versioning, changelog, and git tags. Use this skill when user wants to document a stable version of the project.",
+    "trigger_phrases": [
+      "记录项目",
+      "record project",
+      "version",
+      "版本",
+      "create release",
+      "发布版本"
+    ],
+    "category": "development",
+    "difficulty": "intermediate",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Analyze the changes made since the last version",
+        "details": "Review git log, changed files, and user requirements to determine the version number"
+      },
+      {
+        "step": 2,
+        "action": "Determine version number using semantic versioning",
+        "details": "Major version for breaking changes, minor for new features, patch for bug fixes"
+      },
+      {
+        "step": 3,
+        "action": "Submit code changes to git",
+        "details": "Use 'git add -A' and 'git commit -m' with descriptive message"
+      },
+      {
+        "step": 4,
+        "action": "Create git tag",
+        "details": "Use 'git tag -a v{x.x.x} -m' to create an annotated tag"
+      },
+      {
+        "step": 5,
+        "action": "Write changelog",
+        "details": "Create VERSION_v{x.x.x}.md with release date, version number, status, features, fixes, improvements, changed files, rollback commands, and test results"
+      },
+      {
+        "step": 6,
+        "action": "Submit changelog",
+        "details": "Add and commit the changelog file"
+      },
+      {
+        "step": 7,
+        "action": "Update the tag to include changelog",
+        "details": "Delete old tag and recreate it to include the changelog commit"
+      }
+    ],
+    "output": {
+      "success": {
+        "message": "Project version v{x.x.x} has been recorded successfully",
+        "files_created": [
+          "VERSION_v{x.x.x}.md"
+        ],
+        "git_objects": [
+          "commit",
+          "tag v{x.x.x}"
+        ]
+      }
+    },
+    "rollback_commands": [
+      "git checkout master",
+      "git reset --hard v{x.x.x-1}",
+      "git tag -d v{x.x.x}"
+    ],
+    "examples": [
+      "用户说：'记录项目' → 系统分析变更，建议版本号，等待确认，执行记录操作",
+      "用户说：'这个版本很稳定了，帮我记录一下' → 系统执行记录流程"
+    ],
+    "notes": [
+      "Always present a plan to the user before executing",
+      "Wait for user confirmation ('同意') before proceeding",
+      "Use semantic versioning: major.minor.patch",
+      "Include rollback commands in the changelog",
+      "Keep the changelog in Simplified Chinese (as per project language)"
+    ]
+  }
+}
