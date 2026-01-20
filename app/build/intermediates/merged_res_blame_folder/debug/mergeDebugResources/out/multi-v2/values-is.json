@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.caster.tv.app-mergeDebugResources-40:/values-is/values-is.xml",
+            "outputFile": "com.kbtv.caster.app-mergeDebugResources-40:/values-is/values-is.xml",
             "map": [
                 {
                     "source": "C:\\Users\\kaiji\\.gradle\\caches\\transforms-4\\2fab6c4510c2fee6215e84462387f58f\\transformed\\media3-exoplayer-1.2.1\\res\\values-is\\values-is.xml",

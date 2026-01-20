@@ -1,4 +1,4 @@
-# CasterTV - Android投屏服务
+# KBTVCaster - Android投屏服务
 
 这是一个完整的Android投屏服务应用，支持DLNA/UPnP协议，使用原生Android实现无需第三方UPnP库。
 
@@ -19,7 +19,7 @@
 ## 项目结构
 
 ```
-CasterTVService/
+KBTVCaster/
 ├── app/
 │   ├── src/main/
 │   │   ├── java/com/caster/tv/
@@ -60,7 +60,7 @@ CasterTVService/
 
 1. 打开Android Studio
 2. 选择 **Open** 或 **Import Project**
-3. 导航到 `CasterTVService` 文件夹
+3. 导航到 `KBTVCaster` 文件夹
 4. 等待Gradle同步完成
 5. 连接Android TV设备（通过USB或网络ADB）
 
@@ -89,7 +89,7 @@ CasterTVService/
 2. 点击 **启动投屏服务**
 3. 等待服务启动完成
 4. 在手机上打开B站等视频App
-5. 点击投屏按钮，选择 "CasterTV-XXXX" 设备
+5. 点击投屏按钮，选择 "KBTVCaster-XXXX" 设备
 
 ## 测试
 
@@ -141,7 +141,7 @@ CasterTVService/
 
 1. 确保电视和手机在同一网络
 2. 检查防火墙设置允许多播
-3. 重启电视上的CasterTV应用
+3. 重启电视上的KBTVCaster应用
 4. 查看日志：`adb logcat -d | grep -E "caster|CastCoordinator|SSDP"`
 
 ### 投屏失败

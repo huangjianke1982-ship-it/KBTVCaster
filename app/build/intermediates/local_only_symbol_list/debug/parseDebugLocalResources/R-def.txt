@@ -50,4 +50,4 @@ string stop
 string tv_standby_title
 string volume_down
 string volume_up
-style Theme.CasterTVService
+style Theme.KBTVCaster

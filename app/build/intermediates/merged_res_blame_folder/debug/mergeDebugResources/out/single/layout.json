@@ -1,14 +1,6 @@
 [
     {
-        "merged": "com.caster.tv.app-mergeDebugResources-41:/layout/activity_main.xml",
-        "source": "com.caster.tv.app-main-44:/layout/activity_main.xml"
-    },
-    {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-mergeDebugResources-41:\\layout\\layout_remote_control.xml",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\layout\\layout_remote_control.xml"
-    },
-    {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-mergeDebugResources-41:\\layout\\activity_main.xml",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\layout\\activity_main.xml"
+        "merged": "com.kbtv.caster.app-mergeDebugResources-41:/layout/activity_main.xml",
+        "source": "com.kbtv.caster.app-main-44:/layout/activity_main.xml"
     }
 ]

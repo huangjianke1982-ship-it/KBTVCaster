@@ -1,66 +1,58 @@
 [
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\drawable_volume_progress_bar_vertical.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\drawable\\volume_progress_bar_vertical.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/drawable_ic_volume_mute.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/drawable/ic_volume_mute.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\drawable_ic_volume_mute.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\drawable\\ic_volume_mute.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/drawable_remote_button_bg_primary.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/drawable/remote_button_bg_primary.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\layout_layout_remote_control.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\layout\\layout_remote_control.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\drawable_remote_button_bg.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\drawable\\remote_button_bg.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/drawable_ic_volume_speaker_simple.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/drawable/ic_volume_speaker_simple.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\drawable_ic_launcher_foreground.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\drawable\\ic_launcher_foreground.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/drawable/ic_launcher_foreground.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\layout_activity_main.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\layout\\activity_main.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/layout_activity_main.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/layout/activity_main.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\drawable_tv_frame_background.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\drawable\\tv_frame_background.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/drawable_ic_volume_speaker.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/drawable/ic_volume_speaker.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\drawable_volume_progress_bar.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\drawable\\volume_progress_bar.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/drawable_tv_frame_background.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/drawable/tv_frame_background.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\drawable_remote_button_bg_exit.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\drawable\\remote_button_bg_exit.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/drawable_volume_progress_bar.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/drawable/volume_progress_bar.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\drawable_ic_volume_speaker_simple.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\drawable\\ic_volume_speaker_simple.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/drawable_remote_button_bg_exit.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/drawable/remote_button_bg_exit.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/drawable_volume_progress_bar_vertical.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/drawable/volume_progress_bar_vertical.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\mipmap-anydpi-v26\\ic_launcher.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/drawable_overlay_background.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/drawable/overlay_background.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\drawable_overlay_background.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\drawable\\overlay_background.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\drawable_remote_button_bg_primary.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\drawable\\remote_button_bg_primary.xml"
-    },
-    {
-        "merged": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-debug-42:\\drawable_ic_volume_speaker.xml.flat",
-        "source": "C:\\Users\\kaiji\\.gradle\\daemon\\8.7\\com.caster.tv.app-main-44:\\drawable\\ic_volume_speaker.xml"
-    },
-    {
-        "merged": "com.caster.tv.app-debug-42:/layout_activity_main.xml.flat",
-        "source": "com.caster.tv.app-main-44:/layout/activity_main.xml"
+        "merged": "com.kbtv.caster.app-debug-42:/drawable_remote_button_bg.xml.flat",
+        "source": "com.kbtv.caster.app-main-44:/drawable/remote_button_bg.xml"
     }
 ]

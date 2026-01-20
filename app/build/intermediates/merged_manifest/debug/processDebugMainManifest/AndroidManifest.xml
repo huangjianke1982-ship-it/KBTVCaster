@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.caster.tv"
+    package="com.kbtv.caster"
     android:versionCode="1"
-    android:versionName="1.0.0" >
+    android:versionName="0.1.1" >
 
     <uses-sdk
         android:minSdkVersion="23"
@@ -35,13 +35,13 @@
         android:required="false" />
 
     <permission
-        android:name="com.caster.tv.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:name="com.kbtv.caster.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.caster.tv.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <uses-permission android:name="com.kbtv.caster.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 
     <application
-        android:name="com.caster.tv.CasterApplication"
+        android:name="com.kbtv.caster.CasterApplication"
         android:allowBackup="true"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:debuggable="true"
@@ -50,14 +50,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CasterTVService"
+        android:theme="@style/Theme.KBTVCaster"
         android:usesCleartextTraffic="true" >
 
         <!-- Main Activity -->
         <activity
-            android:name="com.caster.tv.ui.MainActivity"
+            android:name="com.kbtv.caster.ui.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.CasterTVService" >
+            android:theme="@style/Theme.KBTVCaster" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -67,7 +67,7 @@
 
         <!-- Main Cast Service (coordinates all services) -->
         <service
-            android:name="com.caster.tv.service.CastCoordinatorService"
+            android:name="com.kbtv.caster.service.CastCoordinatorService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" >
             <intent-filter>
@@ -82,7 +82,7 @@
 
         <!-- Boot Receiver for auto-start -->
         <receiver
-            android:name="com.caster.tv.receiver.BootReceiver"
+            android:name="com.kbtv.caster.receiver.BootReceiver"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
@@ -95,7 +95,7 @@
 
         <provider
             android:name="androidx.startup.InitializationProvider"
-            android:authorities="com.caster.tv.androidx-startup"
+            android:authorities="com.kbtv.caster.androidx-startup"
             android:exported="false" >
             <meta-data
                 android:name="androidx.emoji2.text.EmojiCompatInitializer"

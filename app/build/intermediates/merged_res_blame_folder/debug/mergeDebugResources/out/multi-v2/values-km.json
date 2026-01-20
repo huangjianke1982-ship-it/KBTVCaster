@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.caster.tv.app-mergeDebugResources-40:/values-km/values-km.xml",
+            "outputFile": "com.kbtv.caster.app-mergeDebugResources-40:/values-km/values-km.xml",
             "map": [
                 {
                     "source": "C:\\Users\\kaiji\\.gradle\\caches\\transforms-4\\450097c4b1fa57094951b92c0f4124f6\\transformed\\media3-ui-1.2.1\\res\\values-km\\values-km.xml",

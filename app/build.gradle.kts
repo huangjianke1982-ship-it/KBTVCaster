@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.caster.tv"
+    namespace = "com.kbtv.caster"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.caster.tv"
+        applicationId = "com.kbtv.caster"
         minSdk = 23
         targetSdk = 34
         versionCode = 1

@@ -16,5 +16,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CasterTVService"
+rootProject.name = "KBTVCaster"
 include(":app")

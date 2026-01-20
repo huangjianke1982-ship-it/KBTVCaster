@@ -1,10 +1,10 @@
-# AGENTS.md - CasterTV Development Guide
+# AGENTS.md - KBTVCaster Development Guide
 
-This document provides guidelines for AI agents working on the CasterTV Android project.
+This document provides guidelines for AI agents working on the KBTVCaster Android project.
 
 ## Project Overview
 
-CasterTV is an Android DLNA/UPnP casting service application written in Kotlin. It implements:
+KBTVCaster is an Android DLNA/UPnP casting service application written in Kotlin. It implements:
 - Native SSDP/NSD discovery (no third-party UPnP libraries)
 - ExoPlayer for media playback
 - HTTP server for device description and control
@@ -20,8 +20,8 @@ CasterTV is an Android DLNA/UPnP casting service application written in Kotlin. 
 
 # Testing
 ./gradlew test                   # Run all unit tests
-./gradlew test --tests "com.caster.tv.dlna.AVTransportServiceTest"  # Single test class
-./gradlew test --tests "com.caster.tv.dlna.AVTransportServiceTest.play should change state"  # Single test
+./gradlew test --tests "com.kbtv.caster.dlna.AVTransportServiceTest"  # Single test class
+./gradlew test --tests "com.kbtv.caster.dlna.AVTransportServiceTest.play should change state"  # Single test
 
 # Code Quality
 ./gradlew lint                   # Run lint checks
@@ -54,7 +54,7 @@ import org.jetbrains.*              # JetBrains/Kotlin
 import timber.log.Timber            # Third-party (alphabetical)
 import kotlinx.*                    # KotlinX
 import java.*                       # Java standard library
-import com.caster.tv.*              # Local project
+import com.kbtv.caster.*              # Local project
 ```
 
 ### Formatting Rules
@@ -214,7 +214,7 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 adb logcat -d | grep -E "caster|SSDP|NSD"
 
 # View logs
-adb logcat -d | grep -E "CasterTV|CastCoordinator|AVTransport"
+adb logcat -d | grep -E "KBTVCaster|CastCoordinator|AVTransport"
 ```
 
 ### Lint Configuration
