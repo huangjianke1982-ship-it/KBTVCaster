@@ -79,6 +79,37 @@ This skill is customized for the KBTVCaster Android DLNA/UPnP casting applicatio
 - **Tag before pushing** - safe if network fails mid-release
 - **Include rollback commands** - in every changelog
 
+## Bundled Resources
+
+### Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/analyze_changes.sh` | Analyze git changes since last version |
+| `scripts/determine_version.sh` | Calculate next version based on change type |
+| `scripts/create_commit.sh` | Create git commit for release |
+| `scripts/create_tag.sh` | Create annotated git tag |
+| `scripts/generate_changelog.sh` | Generate VERSION_v{x.x.x}.md |
+| `scripts/publish_release.sh` | Publish to GitHub or create local archive |
+| `scripts/rollback.sh` | Interactive rollback to previous version |
+| `scripts/archive_project.sh` | Archive project at current state |
+
+### References
+
+| File | When to Read |
+|------|--------------|
+| `references/semantic_versioning.md` | Understanding SemVer rules and version bump guidelines |
+| `references/github_release_flow.md` | GitHub release process and requirements |
+| `references/fallback_procedure.md` | Network failure handling and local archive recovery |
+| `references/rollback_procedures.md` | Rollback methods and safety checks |
+
+### Assets
+
+| File | Purpose |
+|------|---------|
+| `assets/changelog_template.md` | Template for VERSION_v{x.x.x}.md |
+| `assets/archive_template.md` | Template for project archives |
+
 ## Example Interaction
 
 ```
