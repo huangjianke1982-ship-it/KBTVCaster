@@ -1,0 +1,41 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Android
+app/build/
+app/*.apk
+app/*.aab
+local.properties
+*.dex
+*.class
+*.ap_
+*.rsa
+*. DSA
+
+# Generated
+bin/
+gen/
+out/
+release/
+
+# Logs
+*.log
+nul
