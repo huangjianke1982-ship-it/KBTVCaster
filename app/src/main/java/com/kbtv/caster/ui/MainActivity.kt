@@ -156,7 +156,7 @@ class MainActivity : AppCompatActivity() {
                         showVideo()
                     }
                 }
-            })
+            }
             playerListener?.let { exoPlayer.addListener(it) }
         }
 
