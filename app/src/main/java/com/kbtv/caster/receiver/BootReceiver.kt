@@ -4,7 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
+import android.os.Handler
+import android.os.Looper
 import com.kbtv.caster.service.CastCoordinatorService
 import timber.log.Timber
 
@@ -33,30 +34,25 @@ class BootReceiver : BroadcastReceiver() {
     }
 
     /**
-     * Start the casting service in the background
+     * Start the casting service in the background after a short delay for WiFi readiness
      */
     private fun startCastingService(context: Context) {
-        try {
-            // Give the system a moment to fully boot (WiFi might need time)
-            Thread.sleep(5000) // Wait 5 seconds for WiFi to be ready
-        } catch (e: InterruptedException) {
-            // Ignore
-        }
+        Handler(Looper.getMainLooper()).postDelayed({
+            try {
+                val serviceIntent = Intent(context, CastCoordinatorService::class.java).apply {
+                    action = CastCoordinatorService.ACTION_START
+                }
 
-        try {
-            val serviceIntent = Intent(context, CastCoordinatorService::class.java).apply {
-                action = CastCoordinatorService.ACTION_START
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(serviceIntent)
+                } else {
+                    context.startService(serviceIntent)
+                }
+
+                Timber.i("Casting service started automatically")
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to start casting service automatically")
             }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(serviceIntent)
-            } else {
-                context.startService(serviceIntent)
-            }
-
-            Timber.i("Casting service started automatically")
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to start casting service automatically")
-        }
+        }, 5000)
     }
 }
