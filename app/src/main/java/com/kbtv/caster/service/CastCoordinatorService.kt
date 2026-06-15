@@ -46,7 +46,7 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
     val rendererReady: LiveData<Boolean> = _rendererReady
 
     // Server state
-    private var isRunning = false
+    @Volatile private var isRunning = false
 
     // ExoPlayer for direct playback
     private var exoPlayer: ExoPlayer? = null
@@ -54,7 +54,7 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
 
     // Auto-restart handler
     private val restartHandler = android.os.Handler(android.os.Looper.getMainLooper())
-    private var restartAttempts = 0
+    @Volatile private var restartAttempts = 0
     private val maxRestartAttempts = 5
     private val restartDelayMillis = 5000L
 
@@ -97,6 +97,8 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
         if (isRunning) return
 
         Timber.d("Starting CastCoordinatorService...")
+        // Call startForeground immediately to meet Android 8+ 5-second requirement
+        showNotification("凯机投屏服务启动中...", "")
         _serviceStatus.value = ServiceStatus.STARTING
 
         try {
@@ -110,6 +112,7 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
             initializeMiracast()
 
             isRunning = true
+            restartAttempts = 0
             _serviceStatus.value = ServiceStatus.RUNNING
 
             Timber.d("CastCoordinatorService started successfully")
@@ -182,6 +185,8 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
      * Stop all casting services
      */
     private fun stop() {
+        // Clear any pending restart callbacks
+        restartHandler.removeCallbacksAndMessages(null)
         if (!isRunning) return
 
         Timber.d("Stopping CastCoordinatorService...")
@@ -201,15 +206,11 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
                 Timber.w("Error stopping DLNA: ${e.message}")
             }
 
-            // Stop ExoPlayer
-            try {
-                exoPlayer?.stop()
-                exoPlayer?.release()
-                exoPlayer = null
-                Timber.d("ExoPlayer stopped")
-            } catch (e: Exception) {
-                Timber.w("Error stopping ExoPlayer: ${e.message}")
-            }
+            // Stop ExoPlayer — separate try/catch so release runs even if stop throws
+            try { exoPlayer?.stop() } catch (e: Exception) { Timber.w("Error stopping ExoPlayer: ${e.message}") }
+            try { exoPlayer?.release() } catch (e: Exception) { Timber.w("Error releasing ExoPlayer: ${e.message}") }
+            exoPlayer = null
+            Timber.d("ExoPlayer stopped")
 
         } catch (e: Exception) {
             Timber.e(e, "Error during stop")
@@ -419,8 +420,8 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
     }
 
     companion object {
-        const val ACTION_START = "com.caster.tv.action.START"
-        const val ACTION_STOP = "com.caster.tv.action.STOP"
+        const val ACTION_START = "com.kbtv.caster.action.START"
+        const val ACTION_STOP = "com.kbtv.caster.action.STOP"
         private const val NOTIFICATION_CHANNEL_ID = "caster_service"
         private const val NOTIFICATION_ID = 1001
         private const val NOTIFICATION_CHANNEL_NAME = "CasterTV Service"
