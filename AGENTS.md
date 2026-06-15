@@ -1,231 +1,182 @@
-# AGENTS.md - KBTVCaster Development Guide
+# AGENTS.md - KBTVCaster
 
-This document provides guidelines for AI agents working on the KBTVCaster Android project.
+**Updated:** 2026-06-15 | **Commit:** 962b207 | **Branch:** master
 
-## Project Overview
+Android TV casting receiver: DLNA (Cling UPnP), Miracast (WiFi Display), AirPlay (stub). ExoPlayer playback, foreground service.
 
-KBTVCaster is an Android DLNA/UPnP casting service application written in Kotlin. It implements:
-- Native SSDP/NSD discovery (no third-party UPnP libraries)
-- ExoPlayer for media playback
-- HTTP server for device description and control
-- Multiple discovery protocols (DLNA, Google Cast, AirPlay)
+## BEHAVIORAL RULES
 
-## Build Commands
+**Think before coding.** State assumptions. If confused, stop and ask. Surface tradeoffs.
+**Simplicity first.** Minimum code that solves the problem. No speculative abstractions.
+**Surgical changes.** Touch only what you must. Match existing style. Every changed line traces to the request.
+**Goal-driven.** Define success criteria as verifiable outcomes. Loop until proven.
+
+## QUICK REFERENCE
 
 ```bash
-# Build
-./gradlew assembleDebug          # Debug APK
-./gradlew assembleRelease        # Release APK
-./gradlew clean                  # Clean build artifacts
-
-# Testing
-./gradlew test                   # Run all unit tests
-./gradlew test --tests "com.kbtv.caster.dlna.AVTransportServiceTest"  # Single test class
-./gradlew test --tests "com.kbtv.caster.dlna.AVTransportServiceTest.play should change state"  # Single test
-
-# Code Quality
-./gradlew lint                   # Run lint checks
-./gradlew build                  # Build + test + lint
+./gradlew assembleDebug                                    # Debug APK
+./gradlew assembleRelease                                  # Release APK (no signing config)
+./gradlew test                                             # All unit tests
+./gradlew test --tests "com.kbtv.caster.dlna.*"           # DLNA tests only
+./gradlew test --tests "com.kbtv.caster.miracast.*"       # Miracast tests only
+./gradlew lint                                             # Lint (non-blocking, informational)
+adb logcat -s "DLNAUtils:*" "CastCoordinator:*" "Timber:*" # Debug log filter
 ```
 
-## Code Style Guidelines
+**Build:** AGP 8.5.0, Kotlin 1.9.24, Gradle 8.7, JDK 11, compileSdk 34, minSdk 23.
 
-### Naming Conventions
+## ARCHITECTURE
 
-| Element | Convention | Examples |
-|---------|-----------|----------|
-| Classes | PascalCase | `CastCoordinatorService`, `HttpRequest` |
-| Functions | camelCase | `start()`, `initializePlayer()`, `handleRequest()` |
-| Constants | UPPER_SNAKE_CASE | `ACTION_START`, `NOTIFICATION_ID` |
-| Package-level variables | camelCase | `httpServer`, `exoPlayer` |
-| LiveData backing props | `_` prefix | `_serviceStatus`, `serviceStatus` |
-| Enums | PascalCase | `ServiceStatus.STOPPED` |
-| Test methods | Backtick descriptive | `` `play should change state to PLAYING` `` |
+```
+Phone (DLNA/Miracast source)
+    │
+    ▼
+CastCoordinatorService (foreground, START_STICKY)
+  ├── DLNA: DLNAUtils → AndroidUpnpServiceImpl (Cling) → ZxtMediaRenderer
+  │     └── AVTransport + RenderingControl UPnP services
+  │     └── ZxtMediaPlayer creates its OWN ExoPlayer (separate from service's)
+  ├── Miracast: MiracastDiscoveryManager (WiFi P2P + JmDNS) → WfdRTSPServer (Netty, :7236)
+  │     └── RTPVideoReceiver (:50000+) → VideoStreamProcessor → H264Decoder → Surface
+  ├── ExoPlayer #1 (service-owned, for direct UI playback)
+  └── AirPlay: NOT WIRED IN (AirPlayManager.start() is a TODO stub)
 
-### Imports Organization
-
-Organize imports in this order with blank lines between groups:
-
-```kotlin
-import android.*                    # Android SDK
-import androidx.*                   # AndroidX
-import com.google.*                 # Google libraries
-import org.jetbrains.*              # JetBrains/Kotlin
-import timber.log.Timber            # Third-party (alphabetical)
-import kotlinx.*                    # KotlinX
-import java.*                       # Java standard library
-import com.kbtv.caster.*              # Local project
+UI: MainActivity binds service via LocalBinder → gets ExoPlayer + Miracast StateFlow
+Boot: BootReceiver → CastCoordinatorService(ACTION_START) after 5s sleep
 ```
 
-### Formatting Rules
+**Design decisions (non-obvious):**
+- `kotlin.incremental=false` — Cling source compilation requires it
+- `usesCleartextTraffic=true` — DLNA/UPnP needs unencrypted HTTP
+- Device name hardcoded as "凯机投屏" in CastCoordinatorService.onCreate
+- No DI framework — singletons via companion object DCL pattern
+- No ViewModel — Activity binds directly to service LiveData/StateFlow
 
-- **Indentation**: 4 spaces (Android Studio default)
-- **Line length**: No hard limit, use IDE formatting
-- **Braces**: K&R style (same line as declaration)
-- **Blank lines**: Single blank line between logical sections
-- **Semicolons**: Omitted (Kotlin standard)
-- **Property access**: Use property syntax (`foo.bar` not `foo.getBar()`)
+## WHERE TO LOOK
 
-### Type System
+| Task | Location | Notes |
+|------|----------|-------|
+| Start/stop all protocols | `service/CastCoordinatorService.kt` | `start()` / `stop()`, coordinates DLNA+Miracast |
+| Add DLNA command | `dlna/DLNAUtils.java` → `com/zxt/dlna/dmr/` | Java bridge to Cling. `AVTransportService.java` for UPnP actions |
+| Change DLNA device name | `service/CastCoordinatorService.kt` `onCreate` | Hardcoded, not from resources |
+| Miracast RTSP protocol | `miracast/streaming/WfdRTSPHandler.kt` | Parse/respond to RTSP methods |
+| Miracast video decode | `miracast/renderer/H264Decoder.kt` | MediaCodec H.264. **Package mismatch:** file in `renderer/` but declares `package streaming` |
+| RTP packet handling | `miracast/streaming/VideoStreamProcessor.kt` | FU-A/STAP-A NAL reassembly |
+| UI / remote keys | `ui/MainActivity.kt` | D-pad media keys, PlayerView lifecycle |
+| Boot auto-start | `receiver/BootReceiver.kt` | BOOT_COMPLETED + QUICKBOOT_POWERON + REBOOT |
+| AirPlay (incomplete) | `airplay/AirPlayManager.kt`, `airplay/server/AirPlayRTSPServer.kt` | Stubs with TODOs. Not initialized by service |
+| Notification channels | `CasterApplication.kt` | Creates `caster_service`, `caster_playback` |
+| UPnP service registration | `AndroidManifest.xml` → `AndroidUpnpServiceImpl` | Cling service, not exported |
+| Versioning | `.opencode/skills/kbtv-versioning/` | Changelog template + scripts. Releases in `releases/` |
 
-```kotlin
-// Prefer val over var
-val serviceStatus: LiveData<ServiceStatus> = ...
+## STRUCTURE
 
-// Use nullable types with safe calls
-val mediaUri: String? = ...
-mediaUri?.let { uri -> playMedia(uri) }
-
-// Use type inference when obvious
-val httpServer = SimpleHttpServer(...)
-
-// Explicit types for public APIs and complex signatures
-fun handleRequest(request: HttpRequest): HttpResponse
-
-// Sealed classes for state
-sealed class ServiceState {
-    data object Stopped : ServiceState()
-    data object Running : ServiceState()
-    data class Error(val message: String) : ServiceState()
-}
+```
+app/src/main/java/
+├── com/kbtv/caster/              # App code (22 Kotlin + 1 Java)
+│   ├── CasterApplication.kt      # Entry: Timber, notification channels, SAX driver
+│   ├── service/CastCoordinatorService.kt  # Central foreground service
+│   ├── receiver/BootReceiver.kt  # Auto-start (BOOT/QUICKBOOT/REBOOT)
+│   ├── ui/                       # MainActivity, MiracastDeviceAdapter
+│   ├── dlna/DLNAUtils.java       # Java bridge: binds Cling, creates ZxtMediaRenderer
+│   ├── airplay/                  # AirPlayManager + RTSPServer (STUB, not wired in)
+│   └── miracast/                 # WiFi Display sink (see miracast/AGENTS.md)
+├── org/fourthline/cling/         # EMBEDDED: Cling UPnP (533 Java files) — DO NOT MODIFY
+└── com/zxt/dlna/                 # EMBEDDED: ZxtMediaRenderer DMR (17 Java files)
+app/libs/                         # 20 JARs: Jetty 8.1, Cling support, seamless, HTTP, servlet
+app/src/test/                     # 3 unit test files (0 instrumented tests)
 ```
 
-### Error Handling
+## CONVENTIONS
+
+**Only what differs from Kotlin/Android defaults:**
 
 ```kotlin
-// Always log exceptions with Timber
-try {
-    operation()
-} catch (e: Exception) {
-    Timber.e(e, "Failed to perform operation")
-    // Handle or rethrow if needed
-}
+// Logging: Timber in Kotlin, android.util.Log in Java (DLNAUtils, com.zxt.dlna)
+Timber.d("state: $value")                    // String interpolation, never concatenation
+Timber.e(e, "Failed to initialize")          // Throwable as 2nd arg
 
-// Use safe calls for nullable operations
+// Error handling: catch+log, never re-throw
+try { risky() } catch (e: Exception) { Timber.e(e, "desc"); /* fallback or return */ }
+
+// Safe calls preferred — force unwrap !! is an anti-pattern (see GOTCHAS)
 val player = exoPlayer ?: return
 
-// Provide fallbacks for expected failure modes
-private fun getLocalIpAddress(): String {
-    return try {
-        // ... network logic
-        address.hostAddress ?: "192.168.0.49"  # Fallback
-    } catch (e: Exception) {
-        "192.168.0.49"  # Hard fallback
+// State exposure: _ backing field + public readonly
+private val _status = MutableLiveData(Status.STOPPED)
+val status: LiveData<Status> = _status
+// StateFlow variant:
+val state: StateFlow<S> = _state.asStateFlow()
+
+// Sealed classes for state machines
+sealed class ConnectionState {
+    data object IDLE : ConnectionState()
+    data class Error(val msg: String) : ConnectionState()
+}
+
+// Singleton via companion object DCL
+companion object {
+    @Volatile private var instance: Foo? = null
+    fun initialize(ctx: Context) = instance ?: synchronized(this) {
+        instance ?: Foo(ctx.applicationContext).also { instance = it }
     }
 }
 ```
 
-### Logging
+| Element | Pattern | Example |
+|---------|---------|---------|
+| Constants | `UPPER_SNAKE_CASE` in companion object | `ACTION_START`, `RTSP_PORT` |
+| LiveData/StateFlow backing | `_` prefix | `_serviceStatus` |
+| Test methods | Backticks | `` `decoder should not be configured initially` `` |
+| TAG constant | Vestigial `private const val TAG = "..."` | Unused — Timber auto-tags. Safe to ignore. |
 
-Use Timber with appropriate levels:
+**Import order:** `android.*` → `androidx.*` → `com.google.*` → `timber.log.Timber` → `kotlinx.*` → `java.*` → `com.kbtv.caster.*` → `com.zxt.dlna.*`
 
-```kotlin
-Timber.d("Debug information")      # Detailed debug
-Timber.i("Operation completed")    # Important milestones
-Timber.w("Something unexpected")   # Warnings
-Timber.e(e, "Failed operation")    # Errors with exception
-```
+**Mixed-language logging:** Chinese messages common in miracast/ module (e.g. `"视频接收错误"`). Match surrounding file's language.
 
-### Architecture Patterns
+## GOTCHAS
 
-**Service Layer** (in `service/`):
-- Foreground services with notification management
-- Lifecycle awareness with LiveData
-- Exposed via Binder for local binding
+| Issue | Location | Impact | Fix |
+|-------|----------|--------|-----|
+| **Dual ExoPlayer** | CastCoordinatorService + ZxtMediaPlayer | DLNA playback may trigger 2 ExoPlayer instances simultaneously | Route all playback through one owner |
+| **Notification channel mismatch** | CasterApplication creates `caster_service` / `caster_playback`; CastCoordinatorService uses `castertv_channel` | Foreground service crash on API 26+ | Align channel IDs |
+| **BootReceiver blocks** | `BootReceiver.kt:41` — `Thread.sleep(5000)` in `onReceive` | Blocks broadcast dispatcher thread | Use `Handler.postDelayed` or WorkManager |
+| **H264Decoder package mismatch** | File at `miracast/renderer/` declares `package streaming` | Confusing, potential build issues | Fix package declaration |
+| **Test package mismatch** | `TransportStateTest.kt`, `MediaUriTest.kt` declare `com.caster.tv.dlna` | Tests may not match refactored package | Update to `com.kbtv.caster.*` |
+| Force unwrap `!!` | `VideoStreamProcessor.kt:170,174`, `VideoRendererPipeline.kt:69`, `MiracastDisplayManager.kt:133`, `MiracastPresentation.kt:107` | NPE risk in RTP hot path | Use `?.let` or `?: return` |
+| Dead Application classes | `airplay/AirPlayApplication.kt`, `miracast/MiracastApplication.kt` | Not in manifest, never loaded | Delete or document as unused |
+| **versionName stale** | `build.gradle.kts:15` says `0.1.1` but latest release is v0.2.1 | Version mismatch | Bump versionName |
+| No instrumented tests | `androidTest/` missing despite espresso deps | UI untested | Remove unused deps or add tests |
+| Cling is source, not Maven | `org/fourthline/cling/` (533 files) | Must not refactor — treat as vendor code | Modify only `com.kbtv.caster.*` and `com.zxt.dlna.*` |
 
-**DLNA Layer** (in `dlna/`):
-- SSDP/NSD discovery protocols
-- HTTP server for device description
-- AVTransport/RenderingControl services
-
-**Data Classes** (for DTOs):
-
-```kotlin
-data class HttpRequest(
-    val method: String,
-    val path: String,
-    val headers: Map<String, String> = emptyMap(),
-    val body: String? = null
-)
-```
-
-### Kotlin Idioms
-
-- **Scope functions**: Use appropriately (`apply`, `let`, `run`, `with`)
-- **Lambda receivers**: `view.setOnClickListener { ... }`
-- **String templates**: `"Device: $deviceName on port $port"`
-- **Collection APIs**: `listOf()`, `mapOf()`, `forEach`, `joinToString`
-- **Coroutines** for async operations (where applicable)
-
-### Testing
+## TESTING
 
 ```kotlin
-@Test
-fun `operation should produce expected result`() {
-    // Given
-    val service = AVTransportService()
-    
-    // When
-    service.play()
-    
-    // Then
-    assertEquals(TransportState.PLAYING, service.getTransportState())
+@RunWith(MockitoJUnitRunner::class)
+class FooTest {
+    @Mock lateinit var mock: Bar
+
+    @Before fun setup() { /* ... */ }
+
+    @Test
+    fun `decoder should not be configured initially`() {
+        `when`(mock.state).thenReturn(IDLE)
+        assertEquals(IDLE, systemUnderTest.state)
+    }
 }
 ```
 
-- Use descriptive backtick test names
-- Follow Given-When-Then structure
-- Mock external dependencies with Mockito
+- **Framework:** JUnit 4 + Mockito 5 + mockito-kotlin
+- **Naming:** Backtick descriptive names
+- **Multiple test classes per file** allowed (see `MiracastUnitTest.kt`: 3 classes)
+- **No Robolectric, no Espresso** — pure JVM unit tests only
+- **Test files:** `dlna/TransportStateTest.kt`, `control/MediaUriTest.kt`, `miracast/MiracastUnitTest.kt`
 
-### Project Structure
+## NOTES
 
-```
-app/src/main/java/com/caster/tv/
-├── CasterApplication.kt          # App entry point
-├── service/
-│   └── CastCoordinatorService.kt # Main coordinator
-├── dlna/
-│   └── upnp/                     # UPnP implementation
-├── airplay/                      # AirPlay service
-├── mirror/                       # Screen mirroring
-├── control/                      # File casting
-└── ui/                           # UI components
-
-app/src/test/java/com/caster/tv/
-└── dlna/
-    └── AVTransportServiceTest.kt
-```
-
-### Key Dependencies
-
-- **AndroidX**: Core-KTX, Lifecycle, Activity/Fragment, ConstraintLayout
-- **Media3 ExoPlayer 1.2.1**: Media playback
-- **Kotlinx Coroutines 1.7.3**: Async operations
-- **OkHttp 4.12.0**: HTTP client
-- **Timber 5.0.1**: Logging
-- **Testing**: JUnit 4.13.2, Mockito 5.8.0
-
-### Common Operations
-
-```bash
-# Check device via ADB
-adb connect <TV_IP>:5555
-adb install app/build/outputs/apk/debug/app-debug.apk
-adb logcat -d | grep -E "caster|SSDP|NSD"
-
-# View logs
-adb logcat -d | grep -E "KBTVCaster|CastCoordinator|AVTransport"
-```
-
-### Lint Configuration
-
-In `app/build.gradle.kts`:
-```kotlin
-lint {
-    warningsAsErrors = false
-    abortOnError = false
-    checkDependencies = true
-}
-```
-
-Lint is informational only - failures don't block builds.
+- **Embedded libraries** (`org.fourthline.cling.*`, `com.zxt.dlna.*`): Source files, not Maven deps. Treat as read-only vendor code. 550 Java files total.
+- **`app/libs/`**: 20 JARs (Jetty 8.1.9, Cling support 2.0.1, seamless-http/xml/util, Apache HTTP). Excluded from slf4j to avoid conflicts.
+- **Netty + JmDNS**: Maven deps for Miracast RTSP server and mDNS discovery. Not in libs/.
+- **Sub-module docs**: See `miracast/AGENTS.md` for Miracast protocol details.
+- **Release process**: Use `.opencode/skills/kbtv-versioning/` skill. Changelogs in `releases/`.
+- **Lint**: Non-blocking (`abortOnError=false`). Informational only.
+- **`temp/` directory**: Working notes and scripts. Not in `.gitignore` but should be.
