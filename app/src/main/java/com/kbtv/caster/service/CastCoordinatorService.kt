@@ -21,8 +21,6 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import com.kbtv.caster.ui.MainActivity
 import com.kbtv.caster.dlna.DLNAUtils
-import com.kbtv.caster.miracast.MiracastManager
-import com.kbtv.caster.miracast.discovery.MiracastDiscoveryManager
 import com.zxt.dlna.dmr.ZxtMediaPlayer
 import timber.log.Timber
 
@@ -108,9 +106,6 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
             // Initialize DLNA using TVRemoteIME's implementation
             initializeDlna()
 
-            // Initialize Miracast receiver
-            initializeMiracast()
-
             isRunning = true
             restartAttempts = 0
             _serviceStatus.value = ServiceStatus.RUNNING
@@ -140,21 +135,6 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
         } catch (e: Exception) {
             Timber.e(e, "Failed to initialize TVRemoteIME DLNA")
             _rendererReady.value = false
-        }
-    }
-
-    /**
-     * Initialize Miracast receiver
-     */
-    private fun initializeMiracast() {
-        try {
-            // 必须先初始化 MiracastDiscoveryManager
-            com.kbtv.caster.miracast.discovery.MiracastDiscoveryManager.initialize(this)
-            // 然后再初始化 MiracastManager
-            MiracastManager.initialize(this)
-            Timber.d("Miracast initialized successfully")
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to initialize Miracast")
         }
     }
 
@@ -192,13 +172,6 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
         Timber.d("Stopping CastCoordinatorService...")
 
         try {
-            // Stop Miracast
-            try {
-                MiracastManager.getInstance().release()
-            } catch (e: Exception) {
-                Timber.w("Error stopping Miracast: ${e.message}")
-            }
-
             // Stop DLNA using TVRemoteIME's implementation
             try {
                 DLNAUtils.stopDLNAService()
@@ -308,18 +281,6 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
      * Get ExoPlayer instance for video rendering
      */
     fun getExoPlayer(): ExoPlayer? = exoPlayer
-
-    /**
-     * Get MiracastManager instance for Miracast control
-     */
-    fun getMiracastManager(): MiracastManager? {
-        return try {
-            MiracastManager.getInstance()
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to get MiracastManager")
-            null
-        }
-    }
 
     // ===== ZxtMediaPlayer.PlaybackListener implementation =====
 

@@ -10,20 +10,14 @@ import android.os.IBinder
 import android.os.Looper
 import android.view.KeyEvent
 import android.view.View
-import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.kbtv.caster.R
-import com.kbtv.caster.miracast.MiracastManager
-import com.kbtv.caster.miracast.discovery.ConnectionState
 import com.kbtv.caster.service.CastCoordinatorService
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
@@ -41,18 +35,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var currentTime: TextView
     private lateinit var totalTime: TextView
 
-    // Miracast UI elements
-    private lateinit var miracastCard: View
-    private lateinit var miracastStatusText: TextView
-    private lateinit var miracastStatusIndicator: View
-    private lateinit var miracastIcon: ImageView
-
     // 服务绑定
     private var coordinatorService: CastCoordinatorService? = null
     private var isBound = false
-
-    // Miracast 管理器
-    private var miracastManager: MiracastManager? = null
 
     // 状态
     private var isPlaying = false
@@ -97,12 +82,6 @@ class MainActivity : AppCompatActivity() {
         seekBar = findViewById(R.id.seekBar)
         currentTime = findViewById(R.id.currentTime)
         totalTime = findViewById(R.id.totalTime)
-
-        // Miracast UI
-        miracastCard = findViewById(R.id.miracastCard)
-        miracastStatusText = findViewById(R.id.miracastStatusText)
-        miracastStatusIndicator = findViewById(R.id.miracastStatusIndicator)
-        miracastIcon = findViewById(R.id.miracastIcon)
 
         // 确保待机界面可见
         Timber.d("Standby UI visibility: ${standbyUi.visibility}")
@@ -159,77 +138,6 @@ class MainActivity : AppCompatActivity() {
             }
             playerListener?.let { exoPlayer.addListener(it) }
         }
-
-        // 初始化 Miracast
-        setupMiracast()
-    }
-
-    /**
-     * 设置 Miracast（自动启动，无需手动操作）
-     */
-    private fun setupMiracast() {
-        miracastManager = coordinatorService?.getMiracastManager()
-        if (miracastManager != null) {
-            // 观察连接状态（手机连接电视时的状态）
-            lifecycleScope.launch {
-                miracastManager?.connectionState?.collectLatest { state ->
-                    handleMiracastStateChange(state)
-                }
-            }
-
-            // 显示接收端状态
-            updateMiracastStatus("已就绪，等待手机连接...")
-            updateStatusIndicator(R.drawable.status_indicator_online)
-        } else {
-            updateMiracastStatus("镜像投屏服务不可用")
-            updateStatusIndicator(R.drawable.status_indicator_offline)
-        }
-    }
-
-    private fun handleMiracastStateChange(state: ConnectionState) {
-        when (state) {
-            is ConnectionState.DISCOVERING -> {
-                // 手机正在发现设备
-                updateMiracastStatus("正在发现设备...")
-            }
-            is ConnectionState.CONNECTING -> {
-                // 正在连接
-                updateMiracastStatus("手机正在连接...")
-            }
-            is ConnectionState.CONNECTED -> {
-                // 已连接
-                val deviceName = miracastManager?.getCurrentDeviceName() ?: ""
-                updateMiracastStatus("已连接: $deviceName")
-                updateStatusIndicator(R.drawable.status_indicator_online)
-            }
-            is ConnectionState.DISCONNECTED -> {
-                updateMiracastStatus("已断开连接，等待手机连接...")
-                updateStatusIndicator(R.drawable.status_indicator_online)
-            }
-            is ConnectionState.WIFI_DISABLED -> {
-                updateMiracastStatus("请开启 Wi-Fi")
-                updateStatusIndicator(R.drawable.status_indicator_offline)
-            }
-            is ConnectionState.ERROR -> {
-                updateMiracastStatus("连接错误")
-                updateStatusIndicator(R.drawable.status_indicator_offline)
-            }
-            else -> {}
-        }
-    }
-
-    /**
-     * 更新状态指示器
-     */
-    private fun updateStatusIndicator(drawableRes: Int) {
-        miracastStatusIndicator.setBackgroundResource(drawableRes)
-    }
-
-    /**
-     * 更新 Miracast 状态文字
-     */
-    private fun updateMiracastStatus(message: String) {
-        miracastStatusText.text = message
     }
 
     private fun showVideo() {
