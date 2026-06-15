@@ -23,7 +23,6 @@ import com.kbtv.caster.ui.MainActivity
 import com.kbtv.caster.dlna.DLNAUtils
 import com.kbtv.caster.miracast.MiracastManager
 import com.kbtv.caster.miracast.discovery.MiracastDiscoveryManager
-import com.kbtv.caster.airplay.AirPlayManager
 import com.zxt.dlna.dmr.ZxtMediaPlayer
 import timber.log.Timber
 
@@ -112,9 +111,6 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
             // Initialize Miracast receiver
             initializeMiracast()
 
-            // Initialize AirPlay receiver
-            initializeAirplay()
-
             isRunning = true
             restartAttempts = 0
             _serviceStatus.value = ServiceStatus.RUNNING
@@ -163,33 +159,6 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
     }
 
     /**
-     * Initialize AirPlay receiver
-     */
-    private fun initializeAirplay() {
-        try {
-            val airPlayManager = AirPlayManager.initialize(this)
-            airPlayManager.onPlayUrl = { url ->
-                runOnUiThread { playMediaUrl(url) }
-            }
-            airPlayManager.onStopPlayback = {
-                runOnUiThread { stopMedia() }
-            }
-            airPlayManager.onPlayPause = { playing ->
-                runOnUiThread {
-                    if (playing) exoPlayer?.play() else exoPlayer?.pause()
-                }
-            }
-            airPlayManager.onSeek = { positionMs ->
-                runOnUiThread { exoPlayer?.seekTo(positionMs) }
-            }
-            airPlayManager.start()
-            Timber.d("AirPlay initialized successfully")
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to initialize AirPlay")
-        }
-    }
-
-    /**
      * Initialize ExoPlayer for media playback
      */
     private fun initializePlayer() {
@@ -228,13 +197,6 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
                 MiracastManager.getInstance().release()
             } catch (e: Exception) {
                 Timber.w("Error stopping Miracast: ${e.message}")
-            }
-
-            // Stop AirPlay
-            try {
-                AirPlayManager.getInstance().release()
-            } catch (e: Exception) {
-                Timber.w("Error stopping AirPlay: ${e.message}")
             }
 
             // Stop DLNA using TVRemoteIME's implementation
