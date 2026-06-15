@@ -14,9 +14,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.hls.HlsMediaSource
 import com.kbtv.caster.ui.MainActivity
 import com.kbtv.caster.dlna.DLNAUtils
+import com.kbtv.caster.miracast.MiracastManager
+import com.kbtv.caster.miracast.discovery.MiracastDiscoveryManager
 import com.zxt.dlna.dmr.ZxtMediaPlayer
 import timber.log.Timber
 
@@ -100,6 +106,9 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
             // Initialize DLNA using TVRemoteIME's implementation
             initializeDlna()
 
+            // Initialize Miracast receiver
+            initializeMiracast()
+
             isRunning = true
             _serviceStatus.value = ServiceStatus.RUNNING
 
@@ -128,6 +137,21 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
         } catch (e: Exception) {
             Timber.e(e, "Failed to initialize TVRemoteIME DLNA")
             _rendererReady.value = false
+        }
+    }
+
+    /**
+     * Initialize Miracast receiver
+     */
+    private fun initializeMiracast() {
+        try {
+            // 必须先初始化 MiracastDiscoveryManager
+            com.kbtv.caster.miracast.discovery.MiracastDiscoveryManager.initialize(this)
+            // 然后再初始化 MiracastManager
+            MiracastManager.initialize(this)
+            Timber.d("Miracast initialized successfully")
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to initialize Miracast")
         }
     }
 
@@ -163,6 +187,13 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
         Timber.d("Stopping CastCoordinatorService...")
 
         try {
+            // Stop Miracast
+            try {
+                MiracastManager.getInstance().release()
+            } catch (e: Exception) {
+                Timber.w("Error stopping Miracast: ${e.message}")
+            }
+
             // Stop DLNA using TVRemoteIME's implementation
             try {
                 DLNAUtils.stopDLNAService()
@@ -277,17 +308,55 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
      */
     fun getExoPlayer(): ExoPlayer? = exoPlayer
 
+    /**
+     * Get MiracastManager instance for Miracast control
+     */
+    fun getMiracastManager(): MiracastManager? {
+        return try {
+            MiracastManager.getInstance()
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to get MiracastManager")
+            null
+        }
+    }
+
     // ===== ZxtMediaPlayer.PlaybackListener implementation =====
 
+    @androidx.annotation.OptIn(UnstableApi::class)
     override fun onPlay(uri: Uri) {
         Timber.d("PlaybackListener onPlay: $uri")
         runOnUiThread {
             try {
                 currentMediaUri = uri.toString()
-                val mediaItem = MediaItem.fromUri(uri)
-                exoPlayer?.setMediaItem(mediaItem)
-                exoPlayer?.prepare()
-                exoPlayer?.play()
+                val player = exoPlayer ?: return@runOnUiThread
+                val uriString = uri.toString()
+
+                if (isHlsStream(uriString)) {
+                    val isBaiduNetdisk = uriString.contains("pan.baidu.com")
+                    val dataSourceFactory = if (isBaiduNetdisk) {
+                        Timber.d("Detected Baidu Netdisk URL, setting custom User-Agent")
+                        DefaultHttpDataSource.Factory()
+                            .setUserAgent("pan.baidu.com")
+                            .setConnectTimeoutMs(30000)
+                            .setReadTimeoutMs(30000)
+                    } else {
+                        DefaultDataSource.Factory(this@CastCoordinatorService)
+                    }
+
+                    val mediaItem = MediaItem.Builder()
+                        .setUri(uriString)
+                        .setMimeType("application/x-mpegURL")
+                        .build()
+
+                    val hlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(mediaItem)
+                    player.setMediaSource(hlsMediaSource)
+                    Timber.d("Using HlsMediaSource for playback")
+                } else {
+                    player.setMediaItem(MediaItem.fromUri(uri))
+                }
+                player.prepare()
+                player.play()
                 Timber.d("ExoPlayer started playback: $uri")
 
                 // 投屏时自动将Activity带到前台
@@ -308,6 +377,16 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
                 Timber.e(e, "Failed to play media from URI")
             }
         }
+    }
+
+    /**
+     * Check if the URI is an HLS stream
+     */
+    private fun isHlsStream(uri: String): Boolean {
+        val lower = uri.lowercase()
+        return lower.contains(".m3u8") ||
+               lower.contains("m3u8_auto") ||
+               lower.contains("type=m3u8")
     }
 
     override fun onPause() {

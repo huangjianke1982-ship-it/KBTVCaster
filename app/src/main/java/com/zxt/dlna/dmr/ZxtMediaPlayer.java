@@ -21,22 +21,11 @@ import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControl
 import android.content.Context;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
-import androidx.media3.common.MediaItem;
-import androidx.media3.common.MediaMetadata;
-import androidx.media3.common.Player;
-import androidx.media3.common.util.UnstableApi;
-import androidx.media3.datasource.DefaultDataSource;
-import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.exoplayer.hls.HlsMediaSource;
-import androidx.media3.common.C;
-
 /**
- * ZxtMediaPlayer with ExoPlayer integration for CasterTV.
- * Handles UPnP control commands and actual video playback via ExoPlayer.
+ * ZxtMediaPlayer acts as a UPnP command relay for CasterTV.
+ * Manages transport state and delegates playback to CastCoordinatorService via PlaybackListener.
  */
 public class ZxtMediaPlayer {
 
@@ -56,8 +45,6 @@ public class ZxtMediaPlayer {
     private Context mContext;
     private String currentURI = "";
 
-    // ExoPlayer for actual playback
-    private ExoPlayer exoPlayer;
     private PlaybackListener playbackListener;
 
     /**
@@ -78,52 +65,6 @@ public class ZxtMediaPlayer {
         this.mContext = context;
         this.avTransportLastChange = avTransportLastChange;
         this.renderingControlLastChange = renderingControlLastChange;
-
-        // Initialize ExoPlayer
-        initializePlayer();
-    }
-
-    private void initializePlayer() {
-        try {
-            exoPlayer = new ExoPlayer.Builder(mContext).build();
-            exoPlayer.addListener(new Player.Listener() {
-                @Override
-                public void onPlaybackStateChanged(int playbackState) {
-                    Log.d(TAG, "ExoPlayer state: " + playbackState);
-                    if (playbackState == Player.STATE_ENDED) {
-                        transportStateChanged(TransportState.NO_MEDIA_PRESENT);
-                    }
-                }
-
-                @Override
-                public void onIsPlayingChanged(boolean isPlaying) {
-                    Log.d(TAG, "ExoPlayer isPlaying: " + isPlaying);
-                }
-            });
-            Log.d(TAG, "ExoPlayer initialized successfully");
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to initialize ExoPlayer", e);
-        }
-    }
-
-    /**
-     * Check if the URI is an HLS stream
-     */
-    private boolean isHlsStream(String uri) {
-        return uri.toLowerCase().contains(".m3u8") || 
-               uri.toLowerCase().contains("m3u8_auto") ||
-               uri.toLowerCase().contains("type=m3u8");
-    }
-
-    /**
-     * Create appropriate media source based on URI type
-     */
-    private MediaItem createMediaItem(String uri) {
-        Log.d(TAG, "Creating media item for URI: " + uri);
-        if (isHlsStream(uri)) {
-            Log.d(TAG, "Detected HLS stream, will use HlsMediaSource");
-        }
-        return MediaItem.fromUri(uri);
     }
 
     public void setPlaybackListener(PlaybackListener listener) {
@@ -166,41 +107,6 @@ public class ZxtMediaPlayer {
                 new AVTransportVariable.CurrentTrackURI(uri));
 
         transportStateChanged(TransportState.STOPPED);
-
-        // Play via ExoPlayer - must run on main thread
-        if (exoPlayer != null) {
-            final String uriString = uri.toString();
-            Log.i(TAG, "Preparing ExoPlayer with URI: " + uriString);
-
-            new Handler(Looper.getMainLooper()).post(() -> {
-                try {
-                    if (isHlsStream(uriString)) {
-                        // Use HlsMediaSource for HLS streams
-                        // Force HLS format since URL doesn't end with .m3u8
-                        DefaultDataSource.Factory dataSourceFactory = new DefaultDataSource.Factory(mContext);
-                        HlsMediaSource.Factory hlsFactory = new HlsMediaSource.Factory(dataSourceFactory);
-                        
-                        // Create MediaItem with HLS MIME type hint
-                        MediaItem mediaItem = new MediaItem.Builder()
-                            .setUri(uriString)
-                            .setMimeType("application/x-mpegURL")
-                            .build();
-                        
-                        HlsMediaSource hlsMediaSource = hlsFactory.createMediaSource(mediaItem);
-                        exoPlayer.setMediaSource(hlsMediaSource);
-                        Log.i(TAG, "Using HlsMediaSource with forced HLS MIME type");
-                    } else {
-                        // Use regular MediaItem for other streams (MP4, etc.)
-                        MediaItem mediaItem = MediaItem.fromUri(uriString);
-                        exoPlayer.setMediaItem(mediaItem);
-                    }
-                    exoPlayer.prepare();
-                    Log.i(TAG, "ExoPlayer prepared successfully on main thread");
-                } catch (Exception e) {
-                    Log.e(TAG, "Failed to prepare ExoPlayer on main thread", e);
-                }
-            });
-        }
 
         // Notify listener
         if (playbackListener != null) {
@@ -360,12 +266,6 @@ public class ZxtMediaPlayer {
     public void play() {
         Log.i(TAG, "play");
 
-        // Play via ExoPlayer
-        if (exoPlayer != null && exoPlayer.getPlaybackState() != Player.STATE_IDLE) {
-            exoPlayer.play();
-            Log.d(TAG, "ExoPlayer play() called");
-        }
-
         transportStateChanged(TransportState.PLAYING);
 
         // Notify listener
@@ -376,12 +276,6 @@ public class ZxtMediaPlayer {
 
     public void pause() {
         Log.i(TAG, "pause");
-
-        // Pause via ExoPlayer
-        if (exoPlayer != null) {
-            exoPlayer.pause();
-            Log.d(TAG, "ExoPlayer pause() called");
-        }
 
         transportStateChanged(TransportState.PAUSED_PLAYBACK);
 
@@ -394,12 +288,6 @@ public class ZxtMediaPlayer {
     public void stop() {
         Log.i(TAG, "stop");
 
-        // Stop via ExoPlayer
-        if (exoPlayer != null) {
-            exoPlayer.stop();
-            Log.d(TAG, "ExoPlayer stop() called");
-        }
-
         transportStateChanged(TransportState.STOPPED);
 
         // Notify listener
@@ -410,12 +298,6 @@ public class ZxtMediaPlayer {
 
     public void seek(int position) {
         Log.i(TAG, "seek " + position);
-
-        // Seek via ExoPlayer
-        if (exoPlayer != null) {
-            exoPlayer.seekTo(position);
-            Log.d(TAG, "ExoPlayer seekTo() called: " + position);
-        }
 
         // Update position info
         synchronized (this) {
