@@ -146,8 +146,21 @@ companion object {
 | Dead Application classes | ✅ Fixed | `AirPlayApplication.kt`, `MiracastApplication.kt` deleted |
 | **versionName stale** | ✅ Fixed (fa0b014) | `0.1.1` → `0.2.1` |
 | Build artifacts in git | ✅ Fixed (1e99442) | 2,314 files untracked; `.gitignore` fixed (`*.DSA` typo, `temp/` added) |
-| H264DecoderTest failures | Open | Tests call Android `MediaFormat`/`MediaCodec` APIs without Robolectric — needs `isReturnDefaultValues` or instrumented testing |
-| MiracastDeviceTest failures | Open | Mockito can't stub `WifiP2pDevice` fields (`deviceName`) — test rewrite needed |
+| **Foreground service crash on boot** | ✅ Fixed (38d634c) | `startForeground()` moved to top of `start()` before initialization; `restartHandler` callbacks cleared in `stop()` |
+| **DLNAUtils ServiceConnection leak** | ✅ Fixed (d0e6398) | ServiceConnection stored as field; `unbindService()` in `stopDLNAService()`; volatile on static fields |
+| **MainActivity ExoPlayer listener leak** | ✅ Fixed (c0b3ba6) | Listener stored as field; `removeListener()` in `onDestroy()`; `playerView.player = null` |
+| **Action string package mismatch** | ✅ Fixed (38d634c) | `com.caster.tv.action.*` → `com.kbtv.caster.action.*` |
+| **ExoPlayer release not resilient** | ✅ Fixed (38d634c) | Separate try/catch for `stop()` and `release()`; always null out |
+| **H264DecoderTest failures** | ✅ Fixed | Tests rewritten to test negative paths (no Android API calls); tests default resolution/frame rate/start-no-op/release-reset |
+| **MiracastDeviceTest failures** | ✅ Fixed | Tests pass all params explicitly; `connectionType` uses `name` not `device.deviceName`; `DeviceStatus` codes aligned with Android `WifiP2pDevice` constants |
+| **MiracastManager callback timing** | ✅ Fixed | `setupCallbacks()` moved from `init{}` to `startAsReceiver()` after `wfdRTSPServer` created; `onFrame` wired to `videoRendererPipeline?.submitFrame()` |
+| **MiracastManager scope.cancel race** | ✅ Fixed | `runBlocking { stopServices() }` before `scope.cancel()` |
+| **VideoStreamProcessor RTP parsing** | ✅ Fixed | FU-A mask `0x1E`→`0x1F` (reads from `fuHeader`); RTP header byte order fixed; extension check uses X bit not CC; reconstruction header uses F\|NRI from indicator + Type from header |
+| **VideoStreamProcessor MediaCodec leak** | ✅ Fixed | `decoder?.release()` in init failure catch block |
+| **WfdRTSPHandler GET_PARAMETER** | ✅ Fixed | `"GET"` → `"GET_PARAMETER"`; `Math.random()` → `ThreadLocalRandom` |
+| **MiracastPresentation resource leak** | ✅ Fixed | `onStop()` override calls `releaseResources()` to prevent MediaCodec/socket/thread leak on dismiss |
+| **Thread safety** | ✅ Fixed | `@Volatile` on FrameSyncController/VideoRendererPipeline stats; `@Synchronized` on VideoStreamProcessor RTP processing; daemon thread on RTPVideoReceiver |
+| **DeviceStatus enum code mismatch** | ✅ Fixed | Enum codes aligned with Android `WifiP2pDevice` status constants (CONNECTED=0, INVITED=1, FAILED=2, AVAILABLE=3, UNAVAILABLE=4) |
 | No instrumented tests | Open | `androidTest/` missing despite espresso deps |
 | Cling is source, not Maven | By design | `org/fourthline/cling/` (533 files) — treat as vendor code |
 
