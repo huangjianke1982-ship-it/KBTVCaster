@@ -20,8 +20,10 @@ import com.kbtv.caster.R;
 
 public class DLNAUtils {
     private static String TAG = "DLNAUtils";
-    private static ZxtMediaRenderer mMediaRenderer = null;
-    private static ZxtMediaPlayer.PlaybackListener mPlaybackListener = null;
+    private static volatile ZxtMediaRenderer mMediaRenderer = null;
+    private static volatile ZxtMediaPlayer.PlaybackListener mPlaybackListener = null;
+    private static ServiceConnection mServiceConnection = null;
+    private static Context mAppContext = null;
 
     public static void setDLNANameSuffix(Context context, String nameSuffix){
         SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("dlna_settings", 0);
@@ -50,6 +52,19 @@ public class DLNAUtils {
     }
 
     public static void startDLNAService(final Context context){
+        // Store app context for unbinding later
+        mAppContext = context.getApplicationContext();
+
+        // Unbind existing connection to prevent leak on restart
+        if (mServiceConnection != null) {
+            try {
+                context.unbindService(mServiceConnection);
+            } catch (IllegalArgumentException e) {
+                Log.w(TAG, "Previous service not registered: " + e.getMessage());
+            }
+            mServiceConnection = null;
+        }
+
         ServiceConnection serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
@@ -81,6 +96,7 @@ public class DLNAUtils {
                 Log.i(TAG, "DLNA: onServiceDisconnected");
             }
         };
+        mServiceConnection = serviceConnection;
         context.bindService(
                 new Intent(context, AndroidUpnpServiceImpl.class),
                 serviceConnection, Context.BIND_AUTO_CREATE);
@@ -89,6 +105,15 @@ public class DLNAUtils {
     public static void stopDLNAService(){
         if(mMediaRenderer != null){
             mMediaRenderer.stopAllMediaPlayers();
+            mMediaRenderer = null;
+        }
+        if(mServiceConnection != null && mAppContext != null){
+            try {
+                mAppContext.unbindService(mServiceConnection);
+            } catch (IllegalArgumentException e) {
+                Log.w(TAG, "Service not registered: " + e.getMessage());
+            }
+            mServiceConnection = null;
         }
     }
 }
