@@ -28,7 +28,7 @@ local.properties
 *.class
 *.ap_
 *.rsa
-*. DSA
+*.DSA
 
 # Generated
 bin/
@@ -39,3 +39,6 @@ release/
 # Logs
 *.log
 nul
+
+# Working notes
+temp/
