@@ -54,7 +54,10 @@ public class ZxtMediaRenderer {
 
     final protected LocalDevice device;
 
-   protected  Context mContext;
+    protected  Context mContext;
+
+    /** Set true to stop the LastChange push thread; volatile for cross-thread visibility. */
+    private volatile boolean lastChangeThreadRunning = false;
 
     public ZxtMediaRenderer(int numberOfPlayers, String name, Context context) {
          mContext = context;
@@ -155,21 +158,27 @@ public class ZxtMediaRenderer {
     // to subscribers of the LastChange state variable of each service.
     protected void runLastChangePushThread() {
         // TODO: We should only run this if we actually have event subscribers
-        new Thread() {
+        lastChangeThreadRunning = true;
+        Thread t = new Thread() {
             @Override
             public void run() {
                 try {
-                    while (true) {
+                    while (lastChangeThreadRunning) {
                         // These operations will NOT block and wait for network responses
                         avTransport.fireLastChange();
                         renderingControl.fireLastChange();
                         Thread.sleep(LAST_CHANGE_FIRING_INTERVAL_MILLISECONDS);
                     }
                 } catch (Exception ex) {
-                    Log.e(TAG, "runLastChangePushThread ex", ex);
+                    if (lastChangeThreadRunning) {
+                        Log.e(TAG, "runLastChangePushThread ex", ex);
+                    }
                 }
             }
-        }.start();
+        };
+        t.setName("ZxtMediaRenderer-LastChange");
+        t.setDaemon(true);
+        t.start();
     }
 
     public LocalDevice getDevice() {
@@ -182,6 +191,8 @@ public class ZxtMediaRenderer {
     }
 
     synchronized public void stopAllMediaPlayers() {
+        // Stop the LastChange push thread so it doesn't outlive this renderer
+        lastChangeThreadRunning = false;
         for (ZxtMediaPlayer mediaPlayer : mediaPlayers.values()) {
             TransportState state =
                 mediaPlayer.getCurrentTransportInfo().getCurrentTransportState();
