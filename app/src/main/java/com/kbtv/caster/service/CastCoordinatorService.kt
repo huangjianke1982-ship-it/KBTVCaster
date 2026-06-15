@@ -342,7 +342,7 @@ class CastCoordinatorService : Service(), ZxtMediaPlayer.PlaybackListener {
     companion object {
         const val ACTION_START = "com.caster.tv.action.START"
         const val ACTION_STOP = "com.caster.tv.action.STOP"
-        private const val NOTIFICATION_CHANNEL_ID = "castertv_channel"
+        private const val NOTIFICATION_CHANNEL_ID = "caster_service"
         private const val NOTIFICATION_ID = 1001
         private const val NOTIFICATION_CHANNEL_NAME = "CasterTV Service"
     }
