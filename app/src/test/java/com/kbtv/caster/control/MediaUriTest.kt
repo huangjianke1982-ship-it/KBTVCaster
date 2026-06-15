@@ -1,4 +1,4 @@
-package com.caster.tv.dlna
+package com.kbtv.caster.control
 
 import org.junit.Assert.*
 import org.junit.Test

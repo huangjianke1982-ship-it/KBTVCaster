@@ -1,4 +1,4 @@
-package com.caster.tv.dlna
+package com.kbtv.caster.dlna
 
 import org.fourthline.cling.support.model.TransportState
 import org.junit.Assert.*
