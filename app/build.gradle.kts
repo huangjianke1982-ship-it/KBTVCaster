@@ -52,6 +52,16 @@ android {
             isIncludeAndroidResources = true
         }
     }
+
+    // Packaging options to exclude conflicting files
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/native-image/**"
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/io.netty.versions.properties"
+        }
+    }
 }
 
 dependencies {
@@ -60,6 +70,10 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+
+    // RecyclerView for device list
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.cardview:cardview:1.0.0")
 
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
@@ -96,6 +110,33 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
+    // ============ NEW: Miracast & AirPlay Dependencies ============
+    
+    // Network framework (RTSP servers) - exclude old slf4j to fix conflicts
+    implementation("io.netty:netty-all:4.1.100.Final") {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+        // Exclude platform-specific transports not needed on Android
+        exclude(group = "io.netty", module = "netty-transport-rxtx")
+        exclude(group = "io.netty", module = "netty-transport-sctp")
+        exclude(group = "io.netty", module = "netty-transport-udt")
+    }
+    
+    // Explicit slf4j version to avoid conflicts
+    implementation("org.slf4j:slf4j-api:1.7.36")
+    
+    // mDNS/Bonjour for service discovery
+    implementation("org.jmdns:jmdns:3.5.8")
+
+    // Video processing - using Android MediaCodec (no external libraries needed)
+    // Removed javacv-platform (saves ~100MB) since Android's MediaCodec is sufficient for H.264
+    
+    // Cling UPnP library - using source from TVRemoteIME-master (org.fourthline.cling)
+    // Exclude old slf4j from libs/ to avoid conflicts
+    val clingJars = fileTree("libs") { include("*.jar") }
+    clingJars.exclude { it.file.name.contains("slf4j") }
+    implementation(clingJars)
+    
+    // AndroidX Test
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
