@@ -1,6 +1,6 @@
 # AGENTS.md - KBTVCaster
 
-**Updated:** 2026-06-15 | **Commit:** 962b207 | **Branch:** master
+**Updated:** 2026-06-15 | **Commit:** b490047 | **Branch:** master
 
 Android TV casting receiver: DLNA (Cling UPnP), Miracast (WiFi Display), AirPlay (stub). ExoPlayer playback, foreground service.
 
@@ -170,6 +170,26 @@ class FooTest {
 - **Multiple test classes per file** allowed (see `MiracastUnitTest.kt`: 3 classes)
 - **No Robolectric, no Espresso** — pure JVM unit tests only
 - **Test files:** `dlna/TransportStateTest.kt`, `control/MediaUriTest.kt`, `miracast/MiracastUnitTest.kt`
+
+## GIT
+
+**Atomic commits.** One logical change per commit. Each commit must build and be independently revertible.
+
+**Commit message style:** Plain English imperative. No semantic prefixes (`feat:`, `fix:`).
+
+```
+Add .gitignore to ignore build artifacts          ✅
+Rename project to KBTVCaster (com.caster.tv → …)  ✅
+feat: add new DLNA handler                         ❌ don't use prefix
+update stuff                                       ❌ too vague
+```
+
+**Rules:**
+- 3+ files changed → split into 2+ commits (by module, by concern)
+- Test + implementation go in the same commit
+- Never commit `.gradle/`, `app/build/`, or `*.apk` — these are build artifacts
+- Never commit `temp/` — working notes only
+- `kotlin.incremental=false` means Cling source changes require full recompile — note in commit if touching `org/fourthline/cling/`
 
 ## NOTES
 
