@@ -12,6 +12,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
+    <!-- Notifications (Android 13+) for the foreground service notification -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <!-- Boot completed for auto-start -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -44,15 +47,11 @@
             </intent-filter>
         </activity>
 
-        <!-- Main Cast Service (coordinates all services) -->
+        <!-- Main Cast Service (coordinates all protocols) -->
         <service
             android:name=".service.CastCoordinatorService"
             android:exported="false"
-            android:foregroundServiceType="mediaPlayback">
-            <intent-filter>
-                <action android:name="androidx.media3.session.MediaSessionService"/>
-            </intent-filter>
-        </service>
+            android:foregroundServiceType="mediaPlayback" />
 
         <!-- Android UPnP Service (Cling stack from TVRemoteIME) -->
         <service
