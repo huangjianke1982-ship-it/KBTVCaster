@@ -34,14 +34,14 @@ Phone (DLNA/Miracast source)
 CastCoordinatorService (foreground, START_STICKY)
   ├── DLNA: DLNAUtils → AndroidUpnpServiceImpl (Cling) → ZxtMediaRenderer
   │     └── AVTransport + RenderingControl UPnP services
-  │     └── ZxtMediaPlayer creates its OWN ExoPlayer (separate from service's)
+  │     └── ZxtMediaPlayer: pure UPnP command relay (no ExoPlayer, delegates via PlaybackListener)
   ├── Miracast: MiracastDiscoveryManager (WiFi P2P + JmDNS) → WfdRTSPServer (Netty, :7236)
   │     └── RTPVideoReceiver (:50000+) → VideoStreamProcessor → H264Decoder → Surface
-  ├── ExoPlayer #1 (service-owned, for direct UI playback)
+  ├── ExoPlayer (service-owned, single instance for DLNA + direct UI playback)
   └── AirPlay: NOT WIRED IN (AirPlayManager.start() is a TODO stub)
 
 UI: MainActivity binds service via LocalBinder → gets ExoPlayer + Miracast StateFlow
-Boot: BootReceiver → CastCoordinatorService(ACTION_START) after 5s sleep
+Boot: BootReceiver → CastCoordinatorService(ACTION_START) after 5s Handler.postDelayed
 ```
 
 **Design decisions (non-obvious):**
@@ -135,18 +135,21 @@ companion object {
 
 ## GOTCHAS
 
-| Issue | Location | Impact | Fix |
-|-------|----------|--------|-----|
-| **Dual ExoPlayer** | CastCoordinatorService + ZxtMediaPlayer | DLNA playback may trigger 2 ExoPlayer instances simultaneously | Route all playback through one owner |
-| **Notification channel mismatch** | CasterApplication creates `caster_service` / `caster_playback`; CastCoordinatorService uses `castertv_channel` | Foreground service crash on API 26+ | Align channel IDs |
-| **BootReceiver blocks** | `BootReceiver.kt:41` — `Thread.sleep(5000)` in `onReceive` | Blocks broadcast dispatcher thread | Use `Handler.postDelayed` or WorkManager |
-| **H264Decoder package mismatch** | File at `miracast/renderer/` declares `package streaming` | Confusing, potential build issues | Fix package declaration |
-| **Test package mismatch** | `TransportStateTest.kt`, `MediaUriTest.kt` declare `com.caster.tv.dlna` | Tests may not match refactored package | Update to `com.kbtv.caster.*` |
-| Force unwrap `!!` | `VideoStreamProcessor.kt:170,174`, `VideoRendererPipeline.kt:69`, `MiracastDisplayManager.kt:133`, `MiracastPresentation.kt:107` | NPE risk in RTP hot path | Use `?.let` or `?: return` |
-| Dead Application classes | `airplay/AirPlayApplication.kt`, `miracast/MiracastApplication.kt` | Not in manifest, never loaded | Delete or document as unused |
-| **versionName stale** | `build.gradle.kts:15` says `0.1.1` but latest release is v0.2.1 | Version mismatch | Bump versionName |
-| No instrumented tests | `androidTest/` missing despite espresso deps | UI untested | Remove unused deps or add tests |
-| Cling is source, not Maven | `org/fourthline/cling/` (533 files) | Must not refactor — treat as vendor code | Modify only `com.kbtv.caster.*` and `com.zxt.dlna.*` |
+| Issue | Status | Resolution |
+|-------|--------|------------|
+| **Dual ExoPlayer** | ✅ Fixed (27b4bbd) | ExoPlayer removed from ZxtMediaPlayer; DLNA playback routes through CastCoordinatorService's single ExoPlayer. HLS detection + Baidu Netdisk UA migrated to `onPlay()`. |
+| **Notification channel mismatch** | ✅ Fixed (988473c) | `castertv_channel` → `caster_service` in CastCoordinatorService.kt |
+| **BootReceiver blocks** | ✅ Fixed (d9aaa64) | `Thread.sleep(5000)` → `Handler.postDelayed({}, 5000)` |
+| **H264Decoder package mismatch** | ✅ Fixed | Package declaration `streaming` → `renderer`; MiracastUnitTest refs updated |
+| **Test package mismatch** | ✅ Fixed (e5dd5d1) | `com.caster.tv.dlna` → `com.kbtv.caster.dlna` / `.control` |
+| Force unwrap `!!` | ✅ Fixed | 6 instances across VideoStreamProcessor, VideoRendererPipeline, MiracastDisplayManager, MiracastPresentation → null-safe patterns |
+| Dead Application classes | ✅ Fixed | `AirPlayApplication.kt`, `MiracastApplication.kt` deleted |
+| **versionName stale** | ✅ Fixed (fa0b014) | `0.1.1` → `0.2.1` |
+| Build artifacts in git | ✅ Fixed (1e99442) | 2,314 files untracked; `.gitignore` fixed (`*.DSA` typo, `temp/` added) |
+| H264DecoderTest failures | Open | Tests call Android `MediaFormat`/`MediaCodec` APIs without Robolectric — needs `isReturnDefaultValues` or instrumented testing |
+| MiracastDeviceTest failures | Open | Mockito can't stub `WifiP2pDevice` fields (`deviceName`) — test rewrite needed |
+| No instrumented tests | Open | `androidTest/` missing despite espresso deps |
+| Cling is source, not Maven | By design | `org/fourthline/cling/` (533 files) — treat as vendor code |
 
 ## TESTING
 
